@@ -47,7 +47,7 @@ fi
 echo "Report for ${REPORT_SLOT} on ${TODAY_DATE} is NOT OK or status not found. Running gold_report.py..."
 
 # Run the main gold report script
-"${SCRIPT_DIR}/gold_report.py"
+python3 "${SCRIPT_DIR}/gold_report.py"
 
 # Re-read status after running the main script
 STATUS_JSON_CONTENT=$(cat "$STATUS_FILE" 2>/dev/null || echo '{}')

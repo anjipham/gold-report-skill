@@ -1,5 +1,5 @@
-NVIDIA_API_KEY = "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"
-NVIDIA_MODEL = "google/gemma-4-31b-it"
+NVIDIA_API_KEY = "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"
+NVIDIA_MODEL = "meta/llama-4-maverick-17b-128e-instruct"
 TELEGRAM_BOT_TOKEN = "8538247008:AAGVcs--FGZeoWQfwfFr3kQK7rDARfobIEE"
 TELEGRAM_CHAT_ID = "6874928275"
 ONEDRIVE_PATH = "/home/ubuntu/onedrive_data/Gold_Reports"

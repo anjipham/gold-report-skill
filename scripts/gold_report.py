@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import requests
 from bs4 import BeautifulSoup
 import datetime
@@ -28,13 +29,51 @@ def get_gold_prices():
         res = requests.get("https://sjccantho.vn/gia-vang", headers=headers, timeout=15)
         soup = BeautifulSoup(res.text, 'html.parser')
         for s in soup(["script", "style"]): s.decompose()
-        sjc_prices = soup.find_all(string=lambda text: "SJC" in text and any(char.isdigit() for char in text))
-        data['SJC_CanTho'] = sjc_prices[0].strip() if sjc_prices else "Đang cập nhật..." 
         
-        # SJCCT 99.99 Gold Ring
-        ring_prices = soup.find_all(string=lambda text: ("nhẫn" in text.lower() or "99.99" in text) and any(char.isdigit() for char in text))
-        data['SJCCT_9999_Ring'] = ring_prices[0].strip() if ring_prices else "Đang cập nhật..."
+        # Find SJC Can Tho prices in table
+        sjc_row = None
+        rows = soup.find_all('tr')
+        for row in rows:
+            cells = row.find_all('td')
+            if len(cells) >= 3:
+                first_cell = cells[0].get_text(strip=True)
+                if 'Nhẫn SJCCT 99.99%' in first_cell:
+                    sjc_row = row
+                    break
         
+        if sjc_row:
+            cells = sjc_row.find_all('td')
+            if len(cells) >= 3:
+                mua_price = cells[1].get_text(strip=True)
+                ban_price = cells[2].get_text(strip=True)
+                data['SJC_CanTho'] = f"Mua: {mua_price}, Bán: {ban_price}"
+            else:
+                data['SJC_CanTho'] = "Đang cập nhật..."
+        else:
+            data['SJC_CanTho'] = "Đang cập nhật..."
+        
+        # SJCCT 99.99 Gold Ring (same as above for now, could be from different source)
+        ring_row = None
+        rows = soup.find_all('tr')
+        for row in rows:
+            cells = row.find_all('td')
+            if len(cells) >= 3:
+                first_cell = cells[0].get_text(strip=True)
+                if 'Nhẫn SJCCT 99.99%' in first_cell:
+                    ring_row = row
+                    break
+        
+        if ring_row:
+            cells = ring_row.find_all('td')
+            if len(cells) >= 3:
+                mua_price = cells[1].get_text(strip=True)
+                ban_price = cells[2].get_text(strip=True)
+                data['SJCCT_9999_Ring'] = f"Mua: {mua_price}, Bán: {ban_price}"
+            else:
+                data['SJCCT_9999_Ring'] = "Đang cập nhật..."
+        else:
+            data['SJCCT_9999_Ring'] = "Đang cập nhật..."
+
         # Kitco - Using JSON parsing for reliability
         res = requests.get("https://www.kitco.com/", headers=headers, timeout=15)
         soup = BeautifulSoup(res.text, 'html.parser')
